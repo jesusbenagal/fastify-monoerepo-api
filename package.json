@@ -1,16 +1,13 @@
 {
   "name": "fastify-api",
-  "private": true,
-  "packageManager": "pnpm@9",
-  "workspaces": [
-    "packages/*"
-  ],
+  "private": false,
   "scripts": {
-    "dev": "pnpm -C packages/api dev",
+    "dev": "pnpm --filter @app/api dev",
     "build": "pnpm -r build",
-    "test": "pnpm -r test",
-    "db:studio": "pnpm -C packages/db prisma studio",
-    "db:migrate": "pnpm -C packages/db prisma migrate dev",
-    "db:deploy": "pnpm -C packages/db prisma migrate deploy"
+    "test": "pnpm --filter @app/api test",
+    "db:studio": "pnpm --filter @app/db run studio",
+    "db:migrate": "pnpm --filter @app/db run migrate",
+    "db:deploy": "pnpm --filter @app/db run migrate:deploy",
+    "postinstall": "pnpm --filter @app/db run generate"
   }
 }
