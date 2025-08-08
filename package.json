@@ -1,0 +1,16 @@
+{
+  "name": "fastify-api",
+  "private": true,
+  "packageManager": "pnpm@9",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -C packages/api dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "db:studio": "pnpm -C packages/db prisma studio",
+    "db:migrate": "pnpm -C packages/db prisma migrate dev",
+    "db:deploy": "pnpm -C packages/db prisma migrate deploy"
+  }
+}
