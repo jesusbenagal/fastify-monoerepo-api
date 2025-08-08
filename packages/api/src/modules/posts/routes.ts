@@ -1,5 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
+
+import { getIO } from "../../lib/io";
+
 import { createPost, listPosts } from "./service";
 
 export default async function postsRoutes(app: FastifyInstance) {
@@ -14,6 +17,11 @@ export default async function postsRoutes(app: FastifyInstance) {
       content: z.string().optional(),
     });
     const body = schema.parse(req.body);
-    return createPost(req.user.sub, body.title, body.content);
+
+    const post = await createPost(req.user.sub, body.title, body.content);
+
+    getIO().emit("post:create", post);
+
+    return post;
   });
 }

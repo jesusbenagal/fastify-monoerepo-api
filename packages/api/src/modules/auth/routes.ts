@@ -31,19 +31,45 @@ export default async function authRoutes(app: FastifyInstance) {
     password: z.string().min(6),
   });
 
-  app.post("/login", async (req: any, reply) => {
-    const { email, password } = loginSchema.parse(req.body);
+  app.post(
+    "/login",
+    {
+      schema: {
+        summary: "Login with email/password",
+        body: {
+          type: "object",
+          required: ["email", "password"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", minLength: 6 },
+          },
+        },
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              accessToken: { type: "string" },
+            },
+          },
+          401: { type: "object", properties: { message: { type: "string" } } },
+        },
+      },
+    },
+    async (req: any, reply) => {
+      const { email, password } = loginSchema.parse(req.body);
 
-    const user = await validateCredentials(email, password);
+      const user = await validateCredentials(email, password);
 
-    if (!user) return reply.code(401).send({ message: "Invalid credentials" });
+      if (!user)
+        return reply.code(401).send({ message: "Invalid credentials" });
 
-    const token = app.jwt.sign({
-      sub: user.id,
-      role: user.role,
-      email: user.email,
-    });
+      const token = app.jwt.sign({
+        sub: user.id,
+        role: user.role,
+        email: user.email,
+      });
 
-    return reply.code(200).send({ accessToken: token });
-  });
+      return reply.code(200).send({ accessToken: token });
+    },
+  );
 }
