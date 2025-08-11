@@ -12,8 +12,8 @@
   },
   "scripts": {
     "generate": "prisma generate",
-    "migrate": "prisma migrate dev -n init",
-    "migrate:deploy": "prisma migrate deploy",
+    "migrate": "dotenv -e ../../.env -- prisma migrate dev -n init",
+    "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "studio": "prisma studio",
     "build": "tsc -p tsconfig.json"
   },
@@ -22,6 +22,7 @@
     "prisma": "^6.13.0"
   },
   "devDependencies": {
+    "dotenv-cli": "^8.0.0",
     "typescript": "^5.5.4"
   }
 }

@@ -16,16 +16,20 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await resetDb();
+
   testUser = await createTestUser(
-    "test@example.com",
+    "users-test@example.com",
     "password123",
     "Test User"
   );
 
-  // Login to get auth token
   const loginResponse = await request(app.server)
     .post("/auth/login")
-    .send({ email: "test@example.com", password: "password123" });
+    .send({ email: "users-test@example.com", password: "password123" });
+
+  if (loginResponse.status !== 200) {
+    throw new Error(`Login failed: ${loginResponse.body.message}`);
+  }
 
   authToken = loginResponse.body.accessToken;
 });
@@ -45,7 +49,7 @@ describe("Users", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe(testUser.id);
-      expect(response.body.email).toBe("test@example.com");
+      expect(response.body.email).toBe("users-test@example.com");
       expect(response.body.name).toBe("Test User");
     });
 
@@ -59,7 +63,7 @@ describe("Users", () => {
 
   describe("GET /users", () => {
     it("should list all users", async () => {
-      await createTestUser("user2@example.com", "password123", "User 2");
+      await createTestUser("users-test2@example.com", "password123", "User 2");
 
       const response = await request(app.server)
         .get("/users")
@@ -82,7 +86,7 @@ describe("Users", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe(testUser.id);
-      expect(response.body.email).toBe("test@example.com");
+      expect(response.body.email).toBe("users-test@example.com");
     });
 
     it("should return 404 for non-existent user", async () => {
@@ -104,12 +108,12 @@ describe("Users", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.name).toBe("Updated Name");
-      expect(response.body.email).toBe("test@example.com");
+      expect(response.body.email).toBe("users-test@example.com");
     });
 
     it("should reject updating other user's profile", async () => {
       const otherUser = await createTestUser(
-        "other@example.com",
+        "users-other@example.com",
         "password123",
         "Other User"
       );
@@ -120,7 +124,7 @@ describe("Users", () => {
         .send({ name: "Updated Name" });
 
       expect(response.status).toBe(403);
-      expect(response.body.error).toBe("AppError");
+      expect(response.body.error).toBe("AuthorizationError");
     });
   });
 });
@@ -142,7 +146,7 @@ describe("Posts", () => {
 
     it("should filter posts by author", async () => {
       const otherUser = await createTestUser(
-        "other@example.com",
+        "posts-other@example.com",
         "password123",
         "Other User"
       );

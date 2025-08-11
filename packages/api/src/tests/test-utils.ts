@@ -1,20 +1,16 @@
-import { buildServer } from "../server";
+import { createTestApp as createTestAppWithIO } from "./test-server";
 import { prisma } from "../lib/prisma";
 import { hashPassword } from "../lib/hash";
 
 export async function createTestApp() {
-  const app = await buildServer();
-  await app.ready();
-  return app;
+  return createTestAppWithIO();
 }
 
 export async function resetDb() {
   try {
-    // Limpiar en orden correcto (posts antes que users por foreign key)
     await prisma.post.deleteMany();
     await prisma.user.deleteMany();
 
-    // Verificar que se limpió correctamente
     const userCount = await prisma.user.count();
     const postCount = await prisma.post.count();
 
@@ -22,23 +18,27 @@ export async function resetDb() {
       console.warn(
         `Database not fully cleaned: ${userCount} users, ${postCount} posts`
       );
+      await prisma.$executeRaw`TRUNCATE TABLE "Post" CASCADE`;
+      await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE`;
     }
   } catch (error) {
-    // Si la base de datos no existe o hay otros errores, los ignoramos
     console.warn("Error resetting database:", error);
   }
 }
 
+let userCounter = 0;
+
 export async function createTestUser(
-  email = "test@example.com",
+  email?: string,
   password = "password123",
   name = "Test User"
 ) {
+  const uniqueEmail = email || `test${userCounter++}@example.com`;
   const hashedPassword = hashPassword(password);
 
   return prisma.user.create({
     data: {
-      email,
+      email: uniqueEmail,
       password: hashedPassword,
       name,
       role: "USER",
@@ -73,4 +73,8 @@ export async function createTestPost(
       },
     },
   });
+}
+
+export function resetUserCounter() {
+  userCounter = 0;
 }

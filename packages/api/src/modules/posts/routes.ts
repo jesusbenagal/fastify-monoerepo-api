@@ -104,18 +104,17 @@ export default async function postsRoutes(app: FastifyInstance) {
         },
       },
     },
-    async (req: any) => {
+    async (req: any, reply) => {
       const body = createPostSchema.parse(req.body);
       const post = await createPost(req.user.sub, body.title, body.content);
 
       try {
         getIO().emit("post:create", post);
       } catch (error) {
-        // Socket.IO no está disponible en tests
         console.warn("Socket.IO not available:", error);
       }
 
-      return post;
+      return reply.code(201).send(post);
     }
   );
 }

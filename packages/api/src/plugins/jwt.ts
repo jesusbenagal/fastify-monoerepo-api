@@ -13,7 +13,10 @@ export default async function registerJwt(app: FastifyInstance) {
   app.decorate("auth", async (req: any, reply: any) => {
     try {
       await req.jwtVerify();
+      req.user = req.user || {};
+      app.log.info({ userId: req.user.sub }, "JWT token verified successfully");
     } catch (err) {
+      app.log.error({ error: err }, "JWT verification failed");
       return reply.code(401).send({
         error: "AuthenticationError",
         message: "Invalid or expired token",
@@ -21,7 +24,6 @@ export default async function registerJwt(app: FastifyInstance) {
     }
   });
 
-  // Decorador para verificar roles
   app.decorate("requireRole", (roles: string[]) => {
     return async (req: any, reply: any) => {
       try {

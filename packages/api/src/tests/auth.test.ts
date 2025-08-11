@@ -65,36 +65,40 @@ describe("Auth", () => {
       });
 
       expect(response.status).toBe(409);
-      expect(response.body.error).toBe("AppError");
+      expect(response.body.error).toBe("ConflictError");
     });
   });
 
   describe("POST /auth/login", () => {
     beforeEach(async () => {
-      await createTestUser("test@example.com", "password123", "Test User");
+      await createTestUser(
+        "login-test@example.com",
+        "password123",
+        "Test User"
+      );
     });
 
     it("should login successfully with valid credentials", async () => {
       const response = await request(app.server).post("/auth/login").send({
-        email: "test@example.com",
+        email: "login-test@example.com",
         password: "password123",
       });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("accessToken");
       expect(response.body).toHaveProperty("user");
-      expect(response.body.user.email).toBe("test@example.com");
+      expect(response.body.user.email).toBe("login-test@example.com");
       expect(response.body.user.name).toBe("Test User");
     });
 
     it("should reject login with invalid password", async () => {
       const response = await request(app.server).post("/auth/login").send({
-        email: "test@example.com",
+        email: "login-test@example.com",
         password: "wrongpassword",
       });
 
       expect(response.status).toBe(401);
-      expect(response.body.error).toBe("AppError");
+      expect(response.body.error).toBe("AuthenticationError");
     });
 
     it("should reject login with non-existent email", async () => {
@@ -104,7 +108,7 @@ describe("Auth", () => {
       });
 
       expect(response.status).toBe(401);
-      expect(response.body.error).toBe("AppError");
+      expect(response.body.error).toBe("AuthenticationError");
     });
 
     it("should reject login with invalid email format", async () => {

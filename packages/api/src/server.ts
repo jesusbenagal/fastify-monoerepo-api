@@ -61,12 +61,22 @@ export async function buildServer() {
       });
     }
 
-    // Errores personalizados
+    if (
+      error.statusCode &&
+      error.constructor &&
+      error.constructor.name !== "Error"
+    ) {
+      return reply.status(error.statusCode).send({
+        statusCode: error.statusCode,
+        error: error.constructor.name,
+        message: error.message,
+      });
+    }
+
     const errorResponse = handleError(error);
     return reply.status(errorResponse.statusCode).send(errorResponse);
   });
 
-  // Registrar rutas
   await app.register((await import("./modules/auth/routes")).default, {
     prefix: "/auth",
   });
