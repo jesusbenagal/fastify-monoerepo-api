@@ -1,26 +1,36 @@
 import { prisma } from "../../lib/prisma";
 
-export const createPost = (authorId: string, title: string, content?: string) =>
-  prisma.post.create({
-    data: { authorId, title, content },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      authorId: true,
-      createdAt: true,
+export async function createPost(
+  authorId: string,
+  title: string,
+  content?: string
+) {
+  return prisma.post.create({
+    data: { title, content, authorId },
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     },
   });
+}
 
-export const listPosts = (authorId?: string) =>
-  prisma.post.findMany({
+export async function listPosts(authorId?: string) {
+  return prisma.post.findMany({
     where: authorId ? { authorId } : undefined,
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      authorId: true,
-      createdAt: true,
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     },
+    orderBy: { createdAt: "desc" },
   });
+}

@@ -3,6 +3,8 @@
   "private": false,
   "scripts": {
     "dev": "pnpm --filter @app/api dev",
+    "dev:fast": "pnpm --filter @app/api dev:fast",
+    "dev:nodemon": "pnpm --filter @app/api dev:nodemon",
     "build": "pnpm -r build",
     "test": "pnpm --filter @app/api test",
     "db:studio": "pnpm --filter @app/db run studio",
