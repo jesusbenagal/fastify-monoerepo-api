@@ -137,14 +137,6 @@ Notes:
 
 ---
 
-## 📦 Docker
-```bash
-docker build -t fastify-api ./packages/api
-docker run -p 3000:3000 --env-file packages/api/.env fastify-api
-```
-
----
-
 ## 🔧 Scripts
 ```bash
 pnpm dev
