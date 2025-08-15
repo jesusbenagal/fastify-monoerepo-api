@@ -2,6 +2,7 @@
   "name": "fastify-api",
   "private": false,
   "scripts": {
+    "start": "pnpm --filter @app/api start",
     "dev": "pnpm --filter @app/api dev",
     "dev:fast": "pnpm --filter @app/api dev:fast",
     "dev:nodemon": "pnpm --filter @app/api dev:nodemon",
